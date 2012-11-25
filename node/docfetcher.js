@@ -9,7 +9,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 function DocFetcher(max_doc_size){
     this.docs_being_fetched = {};
-    // need to add a time to docs_being_fetched
+    // need to migrate timeout to config file
+    // what is a sane value?
+    this.timeout = undefined;
     this.max_doc_size = max_doc_size;
     this.cache = undefined;
     this.conmgr = undefined;
@@ -108,9 +110,17 @@ function not_found(connection_id, hash){
 
 }
 
-function heartbeat(){
-    //TODO if a doc has waited long enough for a given connection_id, move to next
-    //TODO if list is empty, send UNAVAILABLE response
+function heartbeat(hash){
+    //if a doc has waited long enough for a given connection_id
+    var now = new Date();
+    if (this.timeout > now - this.docs_being_fetched[hash].contacted){
+	try{
+	    //move to the next connection_id
+	    this.docs_being_fetched[hash].providers.pop();	
+	}catch(err){
+	   //TODO if list is empty, send UNAVAILABLE response
+	}
+    }
 }
 
 DocFetcher.prototype.fetch = fetch;
