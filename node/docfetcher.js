@@ -111,12 +111,18 @@ function not_found(connection_id, hash){
 }
 
 function heartbeat(hash){
-    //if a doc has waited long enough for a given connection_id
+    //if a doc has waited long enough for a given connection_id,
     var now = new Date();
     if (this.timeout > now - this.docs_being_fetched[hash].contacted){
 	try{
-	    //move to the next connection_id
-	    this.docs_being_fetched[hash].providers.pop();	
+	    //pop that connection_id
+	    this.docs_being_fetched[hash].providers.pop();
+	    //and get the next_connection_id or an exception
+	    var next_connection_id = this.docs_being_fetched[hash].providers[0];
+	    /*initiate new fetch?
+	    see response processing in Controller.message
+	    also, if pop() works, why did we use splice(position, 1) in line 94 above?
+	    */
 	}catch(err){
 	   //TODO if list is empty, send UNAVAILABLE response
 	}
